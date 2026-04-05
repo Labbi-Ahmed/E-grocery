@@ -5,6 +5,8 @@ import '../constants/app_colors.dart';
 import '../di/injection.dart';
 import '../../features/cart/presentation/cubit/cart_cubit.dart';
 import '../../features/cart/presentation/cubit/cart_state.dart';
+import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
+import '../../features/wishlist/presentation/cubit/wishlist_state.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -37,8 +39,11 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentIndex = _getCurrentIndex(context);
 
-    return BlocProvider.value(
-      value: getIt<CartCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<CartCubit>()),
+        BlocProvider.value(value: getIt<WishlistCubit>()),
+      ],
       child: Scaffold(
         body: child,
         bottomNavigationBar: Container(
@@ -65,12 +70,17 @@ class MainShell extends StatelessWidget {
                     isActive: currentIndex == 0,
                     onTap: () => _onTap(context, 0),
                   ),
-                  _NavItem(
-                    icon: Icons.favorite_outline,
-                    activeIcon: Icons.favorite,
-                    label: 'Wishlist',
-                    isActive: currentIndex == 1,
-                    onTap: () => _onTap(context, 1),
+                  BlocBuilder<WishlistCubit, WishlistState>(
+                    builder: (context, wishlistState) {
+                      return _NavItem(
+                        icon: Icons.favorite_outline,
+                        activeIcon: Icons.favorite,
+                        label: 'Wishlist',
+                        isActive: currentIndex == 1,
+                        onTap: () => _onTap(context, 1),
+                        badgeCount: wishlistState.itemCount,
+                      );
+                    },
                   ),
                   // Center FAB
                   GestureDetector(

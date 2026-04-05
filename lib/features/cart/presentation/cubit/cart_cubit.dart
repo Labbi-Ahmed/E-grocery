@@ -26,6 +26,9 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> loadCart() async {
+    // Skip if already loaded or has items from addItem
+    if (state.items.isNotEmpty) return;
+
     emit(state.copyWith(status: CartStatus.loading));
 
     final result = await _repository.getCartItems();

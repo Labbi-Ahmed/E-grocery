@@ -21,6 +21,12 @@ class _CartScreenState extends State<CartScreen> {
   final _couponController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    context.read<CartCubit>().loadCart();
+  }
+
+  @override
   void dispose() {
     _couponController.dispose();
     super.dispose();
@@ -40,8 +46,7 @@ class _CartScreenState extends State<CartScreen> {
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
-          if (state.status == CartStatus.loading ||
-              state.status == CartStatus.initial) {
+          if (state.status == CartStatus.loading) {
             return const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );

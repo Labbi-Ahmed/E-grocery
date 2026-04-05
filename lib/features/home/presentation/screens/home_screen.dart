@@ -8,6 +8,7 @@ import '../../../../core/widgets/product_card.dart';
 import '../../../cart/data/models/cart_item_model.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../wishlist/presentation/cubit/wishlist_cubit.dart';
+import '../../../wishlist/presentation/cubit/wishlist_state.dart';
 import '../../data/models/product_model.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
@@ -248,7 +249,7 @@ class HomeScreen extends StatelessWidget {
   ) {
     return SizedBox(
       height: 250,
-      child: BlocBuilder<WishlistCubit, dynamic>(
+      child: BlocBuilder<WishlistCubit, WishlistState>(
         builder: (context, _) {
           final wishlistCubit = context.read<WishlistCubit>();
           return ListView.builder(
@@ -289,7 +290,7 @@ class HomeScreen extends StatelessWidget {
     BuildContext context,
     List<ProductModel> products,
   ) {
-    return BlocBuilder<WishlistCubit, dynamic>(
+    return BlocBuilder<WishlistCubit, WishlistState>(
       builder: (context, _) {
         final wishlistCubit = context.read<WishlistCubit>();
         return Padding(

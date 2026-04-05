@@ -40,11 +40,13 @@ class ProductCardShimmer extends StatelessWidget {
       baseColor: AppColors.surface,
       highlightColor: AppColors.white,
       child: Container(
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(

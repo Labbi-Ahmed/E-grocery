@@ -19,6 +19,8 @@ class WishlistState {
     this.errorMessage,
   });
 
+  int get itemCount => items.length;
+
   List<ProductModel> get filteredItems {
     if (searchQuery.isEmpty) return items;
     return items

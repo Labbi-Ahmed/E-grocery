@@ -121,11 +121,8 @@ class AppRouter {
           ),
           GoRoute(
             path: '/cart',
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: BlocProvider.value(
-                value: getIt<CartCubit>()..loadCart(),
-                child: const CartScreen(),
-              ),
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CartScreen(),
             ),
           ),
           GoRoute(
