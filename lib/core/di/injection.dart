@@ -36,6 +36,10 @@ import '../../features/wholesale/data/datasources/wholesale_mock_datasource.dart
 import '../../features/wholesale/data/repositories/wholesale_repository_impl.dart';
 import '../../features/wholesale/domain/repositories/wholesale_repository.dart';
 import '../../features/wholesale/presentation/cubit/wholesale_cubit.dart';
+import '../../features/wishlist/data/datasources/wishlist_mock_datasource.dart';
+import '../../features/wishlist/data/repositories/wishlist_repository_impl.dart';
+import '../../features/wishlist/domain/repositories/wishlist_repository.dart';
+import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -144,5 +148,16 @@ Future<void> configureDependencies() async {
   );
   getIt.registerLazySingleton<WholesaleCubit>(
     () => WholesaleCubit(getIt<WholesaleRepository>()),
+  );
+
+  // Wishlist
+  getIt.registerLazySingleton<WishlistMockDatasource>(
+    () => WishlistMockDatasource(),
+  );
+  getIt.registerLazySingleton<WishlistRepository>(
+    () => WishlistRepositoryImpl(getIt<WishlistMockDatasource>()),
+  );
+  getIt.registerLazySingleton<WishlistCubit>(
+    () => WishlistCubit(getIt<WishlistRepository>()),
   );
 }
