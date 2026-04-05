@@ -32,6 +32,10 @@ import '../../features/orders/data/datasources/orders_mock_datasource.dart';
 import '../../features/orders/data/repositories/orders_repository_impl.dart';
 import '../../features/orders/domain/repositories/orders_repository.dart';
 import '../../features/orders/presentation/cubit/orders_cubit.dart';
+import '../../features/wholesale/data/datasources/wholesale_mock_datasource.dart';
+import '../../features/wholesale/data/repositories/wholesale_repository_impl.dart';
+import '../../features/wholesale/domain/repositories/wholesale_repository.dart';
+import '../../features/wholesale/presentation/cubit/wholesale_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -129,5 +133,16 @@ Future<void> configureDependencies() async {
   );
   getIt.registerLazySingleton<OrdersCubit>(
     () => OrdersCubit(getIt<OrdersRepository>()),
+  );
+
+  // Wholesale
+  getIt.registerLazySingleton<WholesaleMockDatasource>(
+    () => WholesaleMockDatasource(),
+  );
+  getIt.registerLazySingleton<WholesaleRepository>(
+    () => WholesaleRepositoryImpl(getIt<WholesaleMockDatasource>()),
+  );
+  getIt.registerLazySingleton<WholesaleCubit>(
+    () => WholesaleCubit(getIt<WholesaleRepository>()),
   );
 }
