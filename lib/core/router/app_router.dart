@@ -1,0 +1,189 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/auth/presentation/screens/sign_in_screen.dart';
+import '../../features/auth/presentation/screens/sign_up_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/otp_verification_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/auth/presentation/screens/password_success_screen.dart';
+import '../widgets/main_shell.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/wishlist/presentation/screens/wishlist_screen.dart';
+import '../../features/cart/presentation/screens/cart_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/categories/presentation/screens/categories_screen.dart';
+import '../../features/categories/presentation/screens/search_screen.dart';
+import '../../features/categories/presentation/screens/product_list_screen.dart';
+import '../../features/product_detail/presentation/screens/product_detail_screen.dart';
+import '../../features/checkout/presentation/screens/checkout_screen.dart';
+import '../../features/checkout/presentation/screens/payment_method_screen.dart';
+import '../../features/checkout/presentation/screens/new_address_screen.dart';
+import '../../features/checkout/presentation/screens/order_confirmed_screen.dart';
+import '../../features/store/presentation/screens/store_list_screen.dart';
+import '../../features/store/presentation/screens/store_detail_screen.dart';
+import '../../features/orders/presentation/screens/my_orders_screen.dart';
+import '../../features/orders/presentation/screens/order_detail_screen.dart';
+import '../../features/orders/presentation/screens/track_order_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/notification_settings_screen.dart';
+
+class AppRouter {
+  AppRouter._();
+
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+  static final router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: '/splash',
+    routes: [
+      // Auth routes
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/sign-in',
+        builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(
+        path: '/sign-up',
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/otp-verification',
+        builder: (context, state) => OtpVerificationScreen(
+          email: state.extra as String? ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '/reset-password',
+        builder: (context, state) => const ResetPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/password-success',
+        builder: (context, state) => const PasswordSuccessScreen(),
+      ),
+
+      // Main shell with bottom navigation
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) => MainShell(child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: HomeScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/wishlist',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: WishlistScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/cart',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CartScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/profile',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ProfileScreen(),
+            ),
+          ),
+        ],
+      ),
+
+      // Categories & Search
+      GoRoute(
+        path: '/categories',
+        builder: (context, state) => const CategoriesScreen(),
+      ),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => const SearchScreen(),
+      ),
+      GoRoute(
+        path: '/products/:categoryId',
+        builder: (context, state) => ProductListScreen(
+          categoryId: state.pathParameters['categoryId']!,
+          categoryName: state.extra as String? ?? 'Products',
+        ),
+      ),
+
+      // Product Detail
+      GoRoute(
+        path: '/product/:id',
+        builder: (context, state) => ProductDetailScreen(
+          productId: state.pathParameters['id']!,
+        ),
+      ),
+
+      // Checkout flow
+      GoRoute(
+        path: '/checkout',
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/payment-method',
+        builder: (context, state) => const PaymentMethodScreen(),
+      ),
+      GoRoute(
+        path: '/new-address',
+        builder: (context, state) => const NewAddressScreen(),
+      ),
+      GoRoute(
+        path: '/order-confirmed',
+        builder: (context, state) => const OrderConfirmedScreen(),
+      ),
+
+      // Store
+      GoRoute(
+        path: '/stores',
+        builder: (context, state) => const StoreListScreen(),
+      ),
+      GoRoute(
+        path: '/store/:id',
+        builder: (context, state) => StoreDetailScreen(
+          storeId: state.pathParameters['id']!,
+        ),
+      ),
+
+      // Orders
+      GoRoute(
+        path: '/my-orders',
+        builder: (context, state) => const MyOrdersScreen(),
+      ),
+      GoRoute(
+        path: '/order/:id',
+        builder: (context, state) => OrderDetailScreen(
+          orderId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/track-order/:id',
+        builder: (context, state) => TrackOrderScreen(
+          orderId: state.pathParameters['id']!,
+        ),
+      ),
+
+      // Profile sub-pages
+      GoRoute(
+        path: '/edit-profile',
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/notification-settings',
+        builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+    ],
+  );
+}
