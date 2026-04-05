@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/cart_item_model.dart';
 import '../../domain/repositories/cart_repository.dart';
 import 'cart_state.dart';
 
@@ -6,6 +7,23 @@ class CartCubit extends Cubit<CartState> {
   final CartRepository _repository;
 
   CartCubit(this._repository) : super(const CartState());
+
+  Future<void> addItem(CartItemModel item) async {
+    final existing = state.items.where((i) => i.productId == item.productId);
+    List<CartItemModel> updatedItems;
+    if (existing.isNotEmpty) {
+      updatedItems = state.items.map((i) {
+        if (i.productId == item.productId) {
+          return i.copyWith(quantity: i.quantity + item.quantity);
+        }
+        return i;
+      }).toList();
+    } else {
+      updatedItems = [...state.items, item];
+    }
+    emit(state.copyWith(items: updatedItems, status: CartStatus.loaded));
+    await _repository.addItem(item);
+  }
 
   Future<void> loadCart() async {
     emit(state.copyWith(status: CartStatus.loading));

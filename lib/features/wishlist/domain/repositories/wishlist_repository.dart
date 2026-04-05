@@ -8,4 +8,6 @@ abstract class WishlistRepository {
     String? category,
   });
   Future<Either<ApiException, void>> removeItem(String productId);
+  Future<Either<ApiException, void>> addItem(ProductModel product);
+  bool isWishlisted(String productId);
 }
