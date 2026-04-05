@@ -180,6 +180,9 @@ class _CartScreenState extends State<CartScreen> {
             SizedBox(
               height: 48,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(0, 48),
+                ),
                 onPressed: () {
                   if (_couponController.text.trim().isNotEmpty) {
                     context
