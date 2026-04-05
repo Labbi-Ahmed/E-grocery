@@ -14,6 +14,7 @@ import '../../features/cart/presentation/cubit/checkout_cubit.dart';
 import '../../features/store/presentation/cubit/store_list_cubit.dart';
 import '../../features/store/presentation/cubit/store_detail_cubit.dart';
 import '../../features/store/domain/repositories/store_repository.dart';
+import '../../features/orders/presentation/cubit/orders_cubit.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -232,18 +233,27 @@ class AppRouter {
       // Orders
       GoRoute(
         path: '/my-orders',
-        builder: (context, state) => const MyOrdersScreen(),
+        builder: (context, state) => BlocProvider.value(
+          value: getIt<OrdersCubit>()..loadOrders(),
+          child: const MyOrdersScreen(),
+        ),
       ),
       GoRoute(
         path: '/order/:id',
-        builder: (context, state) => OrderDetailScreen(
-          orderId: state.pathParameters['id']!,
+        builder: (context, state) => BlocProvider.value(
+          value: getIt<OrdersCubit>(),
+          child: OrderDetailScreen(
+            orderId: state.pathParameters['id']!,
+          ),
         ),
       ),
       GoRoute(
         path: '/track-order/:id',
-        builder: (context, state) => TrackOrderScreen(
-          orderId: state.pathParameters['id']!,
+        builder: (context, state) => BlocProvider.value(
+          value: getIt<OrdersCubit>(),
+          child: TrackOrderScreen(
+            orderId: state.pathParameters['id']!,
+          ),
         ),
       ),
 
