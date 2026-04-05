@@ -11,6 +11,9 @@ import '../../features/home/data/datasources/home_mock_datasource.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
+import '../../features/product_detail/data/datasources/product_detail_mock_datasource.dart';
+import '../../features/product_detail/data/repositories/product_detail_repository_impl.dart';
+import '../../features/product_detail/domain/repositories/product_detail_repository.dart';
 import '../../features/categories/data/datasources/categories_mock_datasource.dart';
 import '../../features/categories/data/repositories/categories_repository_impl.dart';
 import '../../features/categories/domain/repositories/categories_repository.dart';
@@ -69,5 +72,13 @@ Future<void> configureDependencies() async {
   );
   getIt.registerFactory<SearchCubit>(
     () => SearchCubit(getIt<CategoriesRepository>()),
+  );
+
+  // Product Detail
+  getIt.registerLazySingleton<ProductDetailMockDatasource>(
+    () => ProductDetailMockDatasource(),
+  );
+  getIt.registerLazySingleton<ProductDetailRepository>(
+    () => ProductDetailRepositoryImpl(getIt<ProductDetailMockDatasource>()),
   );
 }
