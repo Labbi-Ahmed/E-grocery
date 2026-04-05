@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/product_card.dart';
 import '../../../../core/widgets/loading_shimmer.dart';
+import '../../../cart/data/models/cart_item_model.dart';
+import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../home/data/models/product_model.dart';
+import '../../../wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../cubit/product_list_cubit.dart';
 import '../cubit/product_list_state.dart';
 import '../widgets/empty_state_widget.dart';
@@ -42,6 +47,30 @@ class _ProductListScreenState extends State<ProductListScreen> {
         _scrollController.position.maxScrollExtent - 200) {
       context.read<ProductListCubit>().loadMore();
     }
+  }
+
+  void _addToCart(BuildContext context, ProductModel product) {
+    getIt<CartCubit>().addItem(
+      CartItemModel(
+        id: 'cart_${product.id}',
+        productId: product.id,
+        name: product.name,
+        imageUrl: product.imageUrl,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        quantity: 1,
+        variant: product.unit,
+        storeName: product.storeName,
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product.name} added to cart'),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   @override
@@ -185,6 +214,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             return const ProductCardShimmer();
           }
           final product = state.products[index];
+          final wishlistCubit = getIt<WishlistCubit>();
           return ProductCard(
             id: product.id,
             name: product.name,
@@ -194,9 +224,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
             rating: product.rating,
             reviewCount: product.reviewCount,
             discountPercent: product.discountPercent,
+            isWishlisted: wishlistCubit.isWishlisted(product.id),
             onTap: () => context.push('/product/${product.id}'),
-            onAddToCart: () {},
-            onWishlistToggle: () {},
+            onAddToCart: () => _addToCart(context, product),
+            onWishlistToggle: () => wishlistCubit.toggleItem(product),
           );
         },
       );
@@ -215,6 +246,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           );
         }
         final product = state.products[index];
+        final wishlistCubit = getIt<WishlistCubit>();
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: SizedBox(
@@ -228,9 +260,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
               rating: product.rating,
               reviewCount: product.reviewCount,
               discountPercent: product.discountPercent,
+              isWishlisted: wishlistCubit.isWishlisted(product.id),
               onTap: () => context.push('/product/${product.id}'),
-              onAddToCart: () {},
-              onWishlistToggle: () {},
+              onAddToCart: () => _addToCart(context, product),
+              onWishlistToggle: () => wishlistCubit.toggleItem(product),
             ),
           ),
         );
