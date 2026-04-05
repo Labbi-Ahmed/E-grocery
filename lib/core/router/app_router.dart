@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../di/injection.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
+import '../../features/product_detail/presentation/cubit/product_detail_cubit.dart';
+import '../../features/product_detail/domain/repositories/product_detail_repository.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -134,9 +136,16 @@ class AppRouter {
       // Product Detail
       GoRoute(
         path: '/product/:id',
-        builder: (context, state) => ProductDetailScreen(
-          productId: state.pathParameters['id']!,
-        ),
+        builder: (context, state) {
+          final productId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (_) => ProductDetailCubit(
+              repository: getIt<ProductDetailRepository>(),
+              productId: productId,
+            )..loadProduct(),
+            child: ProductDetailScreen(productId: productId),
+          );
+        },
       ),
 
       // Checkout flow
