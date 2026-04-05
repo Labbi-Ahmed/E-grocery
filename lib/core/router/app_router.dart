@@ -5,6 +5,10 @@ import '../di/injection.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/product_detail/presentation/cubit/product_detail_cubit.dart';
 import '../../features/product_detail/domain/repositories/product_detail_repository.dart';
+import '../../features/categories/presentation/cubit/categories_cubit.dart';
+import '../../features/categories/presentation/cubit/product_list_cubit.dart';
+import '../../features/categories/presentation/cubit/search_cubit.dart';
+import '../../features/categories/domain/repositories/categories_repository.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -119,18 +123,33 @@ class AppRouter {
       // Categories & Search
       GoRoute(
         path: '/categories',
-        builder: (context, state) => const CategoriesScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<CategoriesCubit>()..loadCategories(),
+          child: const CategoriesScreen(),
+        ),
       ),
       GoRoute(
         path: '/search',
-        builder: (context, state) => const SearchScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<SearchCubit>()..init(),
+          child: const SearchScreen(),
+        ),
       ),
       GoRoute(
         path: '/products/:categoryId',
-        builder: (context, state) => ProductListScreen(
-          categoryId: state.pathParameters['categoryId']!,
-          categoryName: state.extra as String? ?? 'Products',
-        ),
+        builder: (context, state) {
+          final categoryId = state.pathParameters['categoryId']!;
+          return BlocProvider(
+            create: (_) => ProductListCubit(
+              repository: getIt<CategoriesRepository>(),
+              categoryId: categoryId,
+            )..loadProducts(),
+            child: ProductListScreen(
+              categoryId: categoryId,
+              categoryName: state.extra as String? ?? 'Products',
+            ),
+          );
+        },
       ),
 
       // Product Detail
