@@ -12,6 +12,7 @@ abstract class AuthRepository {
     required String fullName,
     required String email,
     required String password,
+    String? phoneNumber,
   });
 
   Future<Either<ApiException, String>> forgotPassword({

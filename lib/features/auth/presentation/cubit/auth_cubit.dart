@@ -43,6 +43,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String fullName,
     required String email,
     required String password,
+    String? phoneNumber,
   }) async {
     emit(state.copyWith(status: AuthStatus.loading));
 
@@ -50,6 +51,7 @@ class AuthCubit extends Cubit<AuthState> {
       fullName: fullName,
       email: email,
       password: password,
+      phoneNumber: phoneNumber,
     );
 
     result.fold(

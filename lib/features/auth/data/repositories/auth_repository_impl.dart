@@ -37,12 +37,14 @@ class AuthRepositoryImpl implements AuthRepository {
     required String fullName,
     required String email,
     required String password,
+    String? phoneNumber,
   }) async {
     try {
       final response = await _remoteDatasource.register(
         fullName: fullName,
         email: email,
         password: password,
+        phoneNumber: phoneNumber,
       );
       await _localDatasource.saveTokens(
         accessToken: response.accessToken,
