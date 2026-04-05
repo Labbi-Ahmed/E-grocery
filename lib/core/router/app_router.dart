@@ -11,6 +11,9 @@ import '../../features/categories/presentation/cubit/search_cubit.dart';
 import '../../features/categories/domain/repositories/categories_repository.dart';
 import '../../features/cart/presentation/cubit/cart_cubit.dart';
 import '../../features/cart/presentation/cubit/checkout_cubit.dart';
+import '../../features/store/presentation/cubit/store_list_cubit.dart';
+import '../../features/store/presentation/cubit/store_detail_cubit.dart';
+import '../../features/store/domain/repositories/store_repository.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -207,13 +210,23 @@ class AppRouter {
       // Store
       GoRoute(
         path: '/stores',
-        builder: (context, state) => const StoreListScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<StoreListCubit>()..loadStores(),
+          child: const StoreListScreen(),
+        ),
       ),
       GoRoute(
         path: '/store/:id',
-        builder: (context, state) => StoreDetailScreen(
-          storeId: state.pathParameters['id']!,
-        ),
+        builder: (context, state) {
+          final storeId = state.pathParameters['id']!;
+          return BlocProvider(
+            create: (_) => StoreDetailCubit(
+              repository: getIt<StoreRepository>(),
+              storeId: storeId,
+            )..loadStore(),
+            child: StoreDetailScreen(storeId: storeId),
+          );
+        },
       ),
 
       // Orders
