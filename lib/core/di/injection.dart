@@ -28,6 +28,10 @@ import '../../features/store/data/datasources/store_mock_datasource.dart';
 import '../../features/store/data/repositories/store_repository_impl.dart';
 import '../../features/store/domain/repositories/store_repository.dart';
 import '../../features/store/presentation/cubit/store_list_cubit.dart';
+import '../../features/orders/data/datasources/orders_mock_datasource.dart';
+import '../../features/orders/data/repositories/orders_repository_impl.dart';
+import '../../features/orders/domain/repositories/orders_repository.dart';
+import '../../features/orders/presentation/cubit/orders_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -114,5 +118,16 @@ Future<void> configureDependencies() async {
   );
   getIt.registerFactory<StoreListCubit>(
     () => StoreListCubit(getIt<StoreRepository>()),
+  );
+
+  // Orders
+  getIt.registerLazySingleton<OrdersMockDatasource>(
+    () => OrdersMockDatasource(),
+  );
+  getIt.registerLazySingleton<OrdersRepository>(
+    () => OrdersRepositoryImpl(getIt<OrdersMockDatasource>()),
+  );
+  getIt.registerLazySingleton<OrdersCubit>(
+    () => OrdersCubit(getIt<OrdersRepository>()),
   );
 }
