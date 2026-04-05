@@ -1,13 +1,39 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import '../api/api_client.dart';
+import '../../features/auth/data/datasources/auth_remote_datasource.dart';
+import '../../features/auth/data/datasources/auth_local_datasource.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/auth/presentation/cubit/password_reset_cubit.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> configureDependencies() async {
   // Core
   getIt.registerLazySingleton<ApiClient>(() => ApiClient());
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(),
+  );
 
-  // Register feature dependencies here as they are built
-  // Example:
-  // getIt.registerFactory(() => AuthCubit(getIt()));
+  // Auth
+  getIt.registerLazySingleton<AuthRemoteDatasource>(
+    () => AuthRemoteDatasource(getIt<ApiClient>().dio),
+  );
+  getIt.registerLazySingleton<AuthLocalDatasource>(
+    () => AuthLocalDatasource(getIt<FlutterSecureStorage>()),
+  );
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      getIt<AuthRemoteDatasource>(),
+      getIt<AuthLocalDatasource>(),
+    ),
+  );
+  getIt.registerFactory<AuthCubit>(
+    () => AuthCubit(getIt<AuthRepository>()),
+  );
+  getIt.registerFactory<PasswordResetCubit>(
+    () => PasswordResetCubit(getIt<AuthRepository>()),
+  );
 }
