@@ -63,7 +63,13 @@ class AppRouter {
       ),
       GoRoute(
         path: '/reset-password',
-        builder: (context, state) => const ResetPasswordScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, String>? ?? {};
+          return ResetPasswordScreen(
+            email: extra['email'] ?? '',
+            otp: extra['otp'] ?? '',
+          );
+        },
       ),
       GoRoute(
         path: '/password-success',
