@@ -9,6 +9,8 @@ import '../../features/categories/presentation/cubit/categories_cubit.dart';
 import '../../features/categories/presentation/cubit/product_list_cubit.dart';
 import '../../features/categories/presentation/cubit/search_cubit.dart';
 import '../../features/categories/domain/repositories/categories_repository.dart';
+import '../../features/cart/presentation/cubit/cart_cubit.dart';
+import '../../features/cart/presentation/cubit/checkout_cubit.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -107,8 +109,11 @@ class AppRouter {
           ),
           GoRoute(
             path: '/cart',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: CartScreen(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: BlocProvider.value(
+                value: getIt<CartCubit>()..loadCart(),
+                child: const CartScreen(),
+              ),
             ),
           ),
           GoRoute(
@@ -170,15 +175,29 @@ class AppRouter {
       // Checkout flow
       GoRoute(
         path: '/checkout',
-        builder: (context, state) => const CheckoutScreen(),
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: getIt<CartCubit>()),
+            BlocProvider(
+              create: (_) => getIt<CheckoutCubit>()..loadAddresses(),
+            ),
+          ],
+          child: const CheckoutScreen(),
+        ),
       ),
       GoRoute(
         path: '/payment-method',
-        builder: (context, state) => const PaymentMethodScreen(),
+        builder: (context, state) => BlocProvider.value(
+          value: getIt<CheckoutCubit>(),
+          child: const PaymentMethodScreen(),
+        ),
       ),
       GoRoute(
         path: '/new-address',
-        builder: (context, state) => const NewAddressScreen(),
+        builder: (context, state) => BlocProvider.value(
+          value: getIt<CheckoutCubit>(),
+          child: const NewAddressScreen(),
+        ),
       ),
       GoRoute(
         path: '/order-confirmed',
