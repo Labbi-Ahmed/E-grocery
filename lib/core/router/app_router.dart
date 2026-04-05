@@ -19,6 +19,7 @@ import '../../features/wholesale/presentation/cubit/wholesale_cubit.dart';
 import '../../features/wholesale/presentation/screens/wholesale_product_detail_screen.dart';
 import '../../features/wholesale/presentation/screens/wholesale_cart_screen.dart';
 import '../../features/wholesale/presentation/screens/wholesale_account_screen.dart';
+import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -111,8 +112,11 @@ class AppRouter {
           ),
           GoRoute(
             path: '/wishlist',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: WishlistScreen(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: BlocProvider.value(
+                value: getIt<WishlistCubit>()..loadWishlist(),
+                child: const WishlistScreen(),
+              ),
             ),
           ),
           GoRoute(
