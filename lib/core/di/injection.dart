@@ -24,6 +24,10 @@ import '../../features/cart/data/repositories/cart_repository_impl.dart';
 import '../../features/cart/domain/repositories/cart_repository.dart';
 import '../../features/cart/presentation/cubit/cart_cubit.dart';
 import '../../features/cart/presentation/cubit/checkout_cubit.dart';
+import '../../features/store/data/datasources/store_mock_datasource.dart';
+import '../../features/store/data/repositories/store_repository_impl.dart';
+import '../../features/store/domain/repositories/store_repository.dart';
+import '../../features/store/presentation/cubit/store_list_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -99,5 +103,16 @@ Future<void> configureDependencies() async {
   );
   getIt.registerLazySingleton<CheckoutCubit>(
     () => CheckoutCubit(getIt<CartRepository>()),
+  );
+
+  // Store
+  getIt.registerLazySingleton<StoreMockDatasource>(
+    () => StoreMockDatasource(),
+  );
+  getIt.registerLazySingleton<StoreRepository>(
+    () => StoreRepositoryImpl(getIt<StoreMockDatasource>()),
+  );
+  getIt.registerFactory<StoreListCubit>(
+    () => StoreListCubit(getIt<StoreRepository>()),
   );
 }
