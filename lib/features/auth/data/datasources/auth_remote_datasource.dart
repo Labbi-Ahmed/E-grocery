@@ -36,7 +36,7 @@ class AuthRemoteDatasource {
           'full_name': fullName,
           'email': email,
           'password': password,
-          ?if (phoneNumber != null) 'phone_number': phoneNumber,
+          if (phoneNumber != null) 'phone_number': phoneNumber,
         },
       );
       return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);

@@ -1,15 +1,15 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/api/api_exceptions.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_datasource.dart';
+import '../datasources/auth_mock_datasource.dart';
 import '../datasources/auth_local_datasource.dart';
 import '../models/auth_response_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDatasource _remoteDatasource;
+  final AuthMockDatasource _mockDatasource;
   final AuthLocalDatasource _localDatasource;
 
-  AuthRepositoryImpl(this._remoteDatasource, this._localDatasource);
+  AuthRepositoryImpl(this._mockDatasource, this._localDatasource);
 
   @override
   Future<Either<ApiException, AuthResponseModel>> login({
@@ -17,7 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final response = await _remoteDatasource.login(
+      final response = await _mockDatasource.login(
         email: email,
         password: password,
       );
@@ -40,7 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? phoneNumber,
   }) async {
     try {
-      final response = await _remoteDatasource.register(
+      final response = await _mockDatasource.register(
         fullName: fullName,
         email: email,
         password: password,
@@ -62,7 +62,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
   }) async {
     try {
-      final message = await _remoteDatasource.forgotPassword(email: email);
+      final message = await _mockDatasource.forgotPassword(email: email);
       return Right(message);
     } on ApiException catch (e) {
       return Left(e);
@@ -75,7 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String otp,
   }) async {
     try {
-      final message = await _remoteDatasource.verifyOtp(
+      final message = await _mockDatasource.verifyOtp(
         email: email,
         otp: otp,
       );
@@ -92,7 +92,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final message = await _remoteDatasource.resetPassword(
+      final message = await _mockDatasource.resetPassword(
         email: email,
         otp: otp,
         password: password,

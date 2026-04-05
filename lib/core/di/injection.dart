@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import '../api/api_client.dart';
-import '../../features/auth/data/datasources/auth_remote_datasource.dart';
+import '../../features/auth/data/datasources/auth_mock_datasource.dart';
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
@@ -50,16 +50,16 @@ Future<void> configureDependencies() async {
     () => const FlutterSecureStorage(),
   );
 
-  // Auth
-  getIt.registerLazySingleton<AuthRemoteDatasource>(
-    () => AuthRemoteDatasource(getIt<ApiClient>().dio),
+  // Auth (using mock datasource for frontend-first development)
+  getIt.registerLazySingleton<AuthMockDatasource>(
+    () => AuthMockDatasource(),
   );
   getIt.registerLazySingleton<AuthLocalDatasource>(
     () => AuthLocalDatasource(getIt<FlutterSecureStorage>()),
   );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
-      getIt<AuthRemoteDatasource>(),
+      getIt<AuthMockDatasource>(),
       getIt<AuthLocalDatasource>(),
     ),
   );
