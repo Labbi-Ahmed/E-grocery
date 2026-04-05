@@ -15,6 +15,10 @@ import '../../features/store/presentation/cubit/store_list_cubit.dart';
 import '../../features/store/presentation/cubit/store_detail_cubit.dart';
 import '../../features/store/domain/repositories/store_repository.dart';
 import '../../features/orders/presentation/cubit/orders_cubit.dart';
+import '../../features/wholesale/presentation/cubit/wholesale_cubit.dart';
+import '../../features/wholesale/presentation/screens/wholesale_product_detail_screen.dart';
+import '../../features/wholesale/presentation/screens/wholesale_cart_screen.dart';
+import '../../features/wholesale/presentation/screens/wholesale_account_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/sign_in_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -255,6 +259,29 @@ class AppRouter {
             orderId: state.pathParameters['id']!,
           ),
         ),
+      ),
+
+      // Wholesale
+      GoRoute(
+        path: '/wholesale/product/:id',
+        builder: (context, state) {
+          final productId = state.pathParameters['id']!;
+          return BlocProvider.value(
+            value: getIt<WholesaleCubit>()..loadProductDetail(productId),
+            child: WholesaleProductDetailScreen(productId: productId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/wholesale/cart',
+        builder: (context, state) => BlocProvider.value(
+          value: getIt<WholesaleCubit>()..loadCart(),
+          child: const WholesaleCartScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/wholesale/account',
+        builder: (context, state) => const WholesaleAccountScreen(),
       ),
 
       // Profile sub-pages
