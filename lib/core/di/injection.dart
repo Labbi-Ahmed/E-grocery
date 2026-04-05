@@ -7,6 +7,10 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/password_reset_cubit.dart';
+import '../../features/home/data/datasources/home_mock_datasource.dart';
+import '../../features/home/data/repositories/home_repository_impl.dart';
+import '../../features/home/domain/repositories/home_repository.dart';
+import '../../features/home/presentation/cubit/home_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -35,5 +39,16 @@ Future<void> configureDependencies() async {
   );
   getIt.registerFactory<PasswordResetCubit>(
     () => PasswordResetCubit(getIt<AuthRepository>()),
+  );
+
+  // Home
+  getIt.registerLazySingleton<HomeMockDatasource>(
+    () => HomeMockDatasource(),
+  );
+  getIt.registerLazySingleton<HomeRepository>(
+    () => HomeRepositoryImpl(getIt<HomeMockDatasource>()),
+  );
+  getIt.registerFactory<HomeCubit>(
+    () => HomeCubit(getIt<HomeRepository>()),
   );
 }
