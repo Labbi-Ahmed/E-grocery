@@ -31,4 +31,19 @@ class WishlistRepositoryImpl implements WishlistRepository {
       return Left(e);
     }
   }
+
+  @override
+  Future<Either<ApiException, void>> addItem(ProductModel product) async {
+    try {
+      await _mockDatasource.addItem(product);
+      return const Right(null);
+    } on ApiException catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  bool isWishlisted(String productId) {
+    return _mockDatasource.isWishlisted(productId);
+  }
 }

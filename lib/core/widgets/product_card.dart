@@ -190,7 +190,44 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                         ],
+                        const Spacer(),
+                        if (onAddToCart != null)
+                          GestureDetector(
+                            onTap: onAddToCart,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(
+                                Icons.add_shopping_cart,
+                                color: AppColors.white,
+                                size: 16,
+                              ),
+                            ),
+                          ),
                       ],
+                    ),
+                  ] else if (onAddToCart != null) ...[
+                    const SizedBox(height: 4),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: onAddToCart,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(
+                            Icons.add_shopping_cart,
+                            color: AppColors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ],

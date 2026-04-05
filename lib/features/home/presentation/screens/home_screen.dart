@@ -3,7 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/product_card.dart';
+import '../../../cart/data/models/cart_item_model.dart';
+import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../../data/models/product_model.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
@@ -16,84 +20,90 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, state) {
-            if (state.status == HomeStatus.loading ||
-                state.status == HomeStatus.initial) {
-              return const HomeShimmer();
-            }
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<CartCubit>()),
+        BlocProvider.value(value: getIt<WishlistCubit>()),
+      ],
+      child: Scaffold(
+        body: SafeArea(
+          child: BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              if (state.status == HomeStatus.loading ||
+                  state.status == HomeStatus.initial) {
+                return const HomeShimmer();
+              }
 
-            if (state.status == HomeStatus.error &&
-                state.banners.isEmpty) {
-              return _ErrorView(
-                message: state.errorMessage ?? 'Something went wrong',
-                onRetry: () => context.read<HomeCubit>().loadHome(),
-              );
-            }
+              if (state.status == HomeStatus.error &&
+                  state.banners.isEmpty) {
+                return _ErrorView(
+                  message: state.errorMessage ?? 'Something went wrong',
+                  onRetry: () => context.read<HomeCubit>().loadHome(),
+                );
+              }
 
-            return RefreshIndicator(
-              color: AppColors.primary,
-              onRefresh: () => context.read<HomeCubit>().refresh(),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTopBar(context),
-                    _buildSearchBar(context),
-                    const SizedBox(height: 20),
-                    BannerCarousel(banners: state.banners),
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      context,
-                      AppStrings.categories,
-                      () => context.push('/categories'),
-                    ),
-                    const SizedBox(height: 12),
-                    CategoryScroll(
-                      categories: state.categories,
-                      onCategoryTap: (category) {
-                        context.push(
-                          '/products/${category.id}',
-                          extra: category.name,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      context,
-                      AppStrings.featuredProducts,
-                      () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _buildHorizontalProductList(
-                      context,
-                      state.featuredProducts,
-                    ),
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      context,
-                      AppStrings.bestSelling,
-                      () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _buildProductGrid(context, state.bestSelling),
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      context,
-                      AppStrings.popularProducts,
-                      () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _buildProductGrid(context, state.popularProducts),
-                    const SizedBox(height: 24),
-                  ],
+              return RefreshIndicator(
+                color: AppColors.primary,
+                onRefresh: () => context.read<HomeCubit>().refresh(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTopBar(context),
+                      _buildSearchBar(context),
+                      const SizedBox(height: 20),
+                      BannerCarousel(banners: state.banners),
+                      const SizedBox(height: 20),
+                      _buildSectionHeader(
+                        context,
+                        AppStrings.categories,
+                        () => context.push('/categories'),
+                      ),
+                      const SizedBox(height: 12),
+                      CategoryScroll(
+                        categories: state.categories,
+                        onCategoryTap: (category) {
+                          context.push(
+                            '/products/${category.id}',
+                            extra: category.name,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSectionHeader(
+                        context,
+                        AppStrings.featuredProducts,
+                        () {},
+                      ),
+                      const SizedBox(height: 12),
+                      _buildHorizontalProductList(
+                        context,
+                        state.featuredProducts,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSectionHeader(
+                        context,
+                        AppStrings.bestSelling,
+                        () {},
+                      ),
+                      const SizedBox(height: 12),
+                      _buildProductGrid(context, state.bestSelling),
+                      const SizedBox(height: 20),
+                      _buildSectionHeader(
+                        context,
+                        AppStrings.popularProducts,
+                        () {},
+                      ),
+                      const SizedBox(height: 12),
+                      _buildProductGrid(context, state.popularProducts),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -208,36 +218,67 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  void _addToCart(BuildContext context, ProductModel product) {
+    context.read<CartCubit>().addItem(
+          CartItemModel(
+            id: 'cart_${product.id}',
+            productId: product.id,
+            name: product.name,
+            imageUrl: product.imageUrl,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            quantity: 1,
+            variant: product.unit,
+            storeName: product.storeName,
+          ),
+        );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product.name} added to cart'),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
   Widget _buildHorizontalProductList(
     BuildContext context,
     List<ProductModel> products,
   ) {
     return SizedBox(
-      height: 230,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return SizedBox(
-            width: 160,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: ProductCard(
-                id: product.id,
-                name: product.name,
-                imageUrl: product.imageUrl,
-                price: product.price,
-                originalPrice: product.originalPrice,
-                rating: product.rating,
-                reviewCount: product.reviewCount,
-                discountPercent: product.discountPercent,
-                onTap: () => context.push('/product/${product.id}'),
-                onAddToCart: () {},
-                onWishlistToggle: () {},
-              ),
-            ),
+      height: 250,
+      child: BlocBuilder<WishlistCubit, dynamic>(
+        builder: (context, _) {
+          final wishlistCubit = context.read<WishlistCubit>();
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index];
+              return SizedBox(
+                width: 160,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: ProductCard(
+                    id: product.id,
+                    name: product.name,
+                    imageUrl: product.imageUrl,
+                    price: product.price,
+                    originalPrice: product.originalPrice,
+                    rating: product.rating,
+                    reviewCount: product.reviewCount,
+                    discountPercent: product.discountPercent,
+                    isWishlisted: wishlistCubit.isWishlisted(product.id),
+                    onTap: () => context.push('/product/${product.id}'),
+                    onAddToCart: () => _addToCart(context, product),
+                    onWishlistToggle: () =>
+                        wishlistCubit.toggleItem(product),
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
@@ -248,35 +289,42 @@ class HomeScreen extends StatelessWidget {
     BuildContext context,
     List<ProductModel> products,
   ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.68,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ProductCard(
-            id: product.id,
-            name: product.name,
-            imageUrl: product.imageUrl,
-            price: product.price,
-            originalPrice: product.originalPrice,
-            rating: product.rating,
-            reviewCount: product.reviewCount,
-            discountPercent: product.discountPercent,
-            onTap: () => context.push('/product/${product.id}'),
-            onAddToCart: () {},
-            onWishlistToggle: () {},
-          );
-        },
-      ),
+    return BlocBuilder<WishlistCubit, dynamic>(
+      builder: (context, _) {
+        final wishlistCubit = context.read<WishlistCubit>();
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.62,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index];
+              return ProductCard(
+                id: product.id,
+                name: product.name,
+                imageUrl: product.imageUrl,
+                price: product.price,
+                originalPrice: product.originalPrice,
+                rating: product.rating,
+                reviewCount: product.reviewCount,
+                discountPercent: product.discountPercent,
+                isWishlisted: wishlistCubit.isWishlisted(product.id),
+                onTap: () => context.push('/product/${product.id}'),
+                onAddToCart: () => _addToCart(context, product),
+                onWishlistToggle: () =>
+                    wishlistCubit.toggleItem(product),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

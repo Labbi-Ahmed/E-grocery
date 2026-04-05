@@ -3,10 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/loading_shimmer.dart';
 import '../../../../core/widgets/product_card.dart';
+import '../../../cart/data/models/cart_item_model.dart';
+import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../home/data/models/product_model.dart';
+import '../../../wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../cubit/product_detail_cubit.dart';
 import '../cubit/product_detail_state.dart';
 import '../widgets/product_image_gallery.dart';
@@ -33,11 +38,33 @@ class ProductDetailScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: Icon(
-                  state.isWishlisted ? Icons.favorite : Icons.favorite_border,
-                  color: state.isWishlisted ? AppColors.error : null,
+                  getIt<WishlistCubit>().isWishlisted(productId)
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color: getIt<WishlistCubit>().isWishlisted(productId)
+                      ? AppColors.error
+                      : null,
                 ),
-                onPressed: () =>
-                    context.read<ProductDetailCubit>().toggleWishlist(),
+                onPressed: () {
+                  final product = state.product;
+                  if (product != null) {
+                    getIt<WishlistCubit>().toggleItem(
+                      ProductModel(
+                        id: product.id,
+                        name: product.name,
+                        imageUrl: product.imageUrl,
+                        price: product.price,
+                        originalPrice: product.originalPrice,
+                        rating: product.rating,
+                        reviewCount: product.reviewCount,
+                        discountPercent: product.discountPercent,
+                        unit: product.unit,
+                        storeName: product.storeName,
+                      ),
+                    );
+                    context.read<ProductDetailCubit>().toggleWishlist();
+                  }
+                },
               ),
               IconButton(
                 icon: const Icon(Icons.share_outlined),
@@ -388,8 +415,33 @@ class ProductDetailScreen extends StatelessWidget {
                         rating: related.rating,
                         reviewCount: related.reviewCount,
                         discountPercent: related.discountPercent,
+                        isWishlisted: getIt<WishlistCubit>().isWishlisted(related.id),
                         onTap: () =>
                             context.push('/product/${related.id}'),
+                        onAddToCart: () {
+                          getIt<CartCubit>().addItem(
+                            CartItemModel(
+                              id: 'cart_${related.id}',
+                              productId: related.id,
+                              name: related.name,
+                              imageUrl: related.imageUrl,
+                              price: related.price,
+                              originalPrice: related.originalPrice,
+                              quantity: 1,
+                              storeName: related.storeName,
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${related.name} added to cart'),
+                              backgroundColor: AppColors.primary,
+                              behavior: SnackBarBehavior.floating,
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                        onWishlistToggle: () =>
+                            getIt<WishlistCubit>().toggleItem(related),
                       ),
                     ),
                   );
@@ -419,13 +471,29 @@ class ProductDetailScreen extends StatelessWidget {
         child: AppButton(
           text: AppStrings.addToCart,
           onPressed: () {
+            final product = state.product!;
+            getIt<CartCubit>().addItem(
+              CartItemModel(
+                id: 'cart_${product.id}_${DateTime.now().millisecondsSinceEpoch}',
+                productId: product.id,
+                name: product.name,
+                imageUrl: product.imageUrl,
+                price: product.price,
+                originalPrice: product.originalPrice,
+                quantity: state.quantity,
+                variant: state.selectedVariant,
+                storeName: product.storeName,
+                storeId: product.storeId,
+              ),
+            );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  '${state.quantity}x ${state.product!.name} added to cart',
+                  '${state.quantity}x ${product.name} added to cart',
                 ),
                 backgroundColor: AppColors.primary,
                 behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 1),
               ),
             );
           },

@@ -96,4 +96,15 @@ class WishlistMockDatasource {
     await Future.delayed(const Duration(milliseconds: 200));
     _items.removeWhere((item) => item.id == productId);
   }
+
+  bool isWishlisted(String productId) {
+    return _items.any((item) => item.id == productId);
+  }
+
+  Future<void> addItem(ProductModel product) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (!_items.any((item) => item.id == product.id)) {
+      _items.add(product);
+    }
+  }
 }

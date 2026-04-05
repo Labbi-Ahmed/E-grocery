@@ -82,6 +82,18 @@ class CartMockDatasource {
     return List.from(_items);
   }
 
+  Future<void> addItem(CartItemModel item) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final index = _items.indexWhere((i) => i.productId == item.productId);
+    if (index != -1) {
+      _items[index] = _items[index].copyWith(
+        quantity: _items[index].quantity + item.quantity,
+      );
+    } else {
+      _items.add(item);
+    }
+  }
+
   Future<void> updateQuantity(String id, int quantity) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final index = _items.indexWhere((item) => item.id == id);

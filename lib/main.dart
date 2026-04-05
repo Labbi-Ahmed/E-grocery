@@ -5,6 +5,8 @@ import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/di/injection.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'features/cart/presentation/cubit/cart_cubit.dart';
+import 'features/wishlist/presentation/cubit/wishlist_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +27,10 @@ void main() async {
 
   // Initialize dependencies
   await configureDependencies();
+
+  // Pre-load cart and wishlist so badge counts are ready
+  getIt<CartCubit>().loadCart();
+  getIt<WishlistCubit>().loadWishlist();
 
   runApp(const EGroceryApp());
 }

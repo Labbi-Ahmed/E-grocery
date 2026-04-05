@@ -5,6 +5,7 @@ import '../../data/models/address_model.dart';
 
 abstract class CartRepository {
   Future<Either<ApiException, List<CartItemModel>>> getCartItems();
+  Future<Either<ApiException, void>> addItem(CartItemModel item);
   Future<Either<ApiException, void>> updateQuantity(String id, int quantity);
   Future<Either<ApiException, void>> removeItem(String id);
   Future<Either<ApiException, double>> applyCoupon(String code);

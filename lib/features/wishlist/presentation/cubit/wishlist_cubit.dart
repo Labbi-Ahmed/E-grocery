@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../home/data/models/product_model.dart';
 import '../../domain/repositories/wishlist_repository.dart';
 import 'wishlist_state.dart';
 
@@ -6,6 +7,20 @@ class WishlistCubit extends Cubit<WishlistState> {
   final WishlistRepository _repository;
 
   WishlistCubit(this._repository) : super(const WishlistState());
+
+  bool isWishlisted(String productId) {
+    return state.items.any((item) => item.id == productId);
+  }
+
+  Future<void> toggleItem(ProductModel product) async {
+    if (isWishlisted(product.id)) {
+      await removeItem(product.id);
+    } else {
+      final updatedItems = [...state.items, product];
+      emit(state.copyWith(items: updatedItems));
+      await _repository.addItem(product);
+    }
+  }
 
   Future<void> loadWishlist() async {
     emit(state.copyWith(status: WishlistStatus.loading));

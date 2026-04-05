@@ -21,6 +21,16 @@ class CartRepositoryImpl implements CartRepository {
   }
 
   @override
+  Future<Either<ApiException, void>> addItem(CartItemModel item) async {
+    try {
+      await _mockDatasource.addItem(item);
+      return const Right(null);
+    } on ApiException catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
   Future<Either<ApiException, void>> updateQuantity(
     String id,
     int quantity,
